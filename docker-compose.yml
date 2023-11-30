@@ -1,0 +1,91 @@
+version: '3.3'
+
+services:
+  frontend:
+    build: build/nodejs
+    container_name: frontend
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - node-modules:/app/node_modules
+    command: sh -c "yarn && yarn dev"
+    ports:
+      - "3000:3000"
+    networks:
+      - frontend
+    tty: true
+
+  backend:
+    container_name: backend
+    # tty: true
+    depends_on:
+      - db
+    build: build/go
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    networks:
+      - frontend
+      - backend
+
+  db:
+    image: mysql:5.7
+    build: build/mysql
+    restart: always
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: pass
+      MYSQL_DATABASE: sample
+      MYSQL_PASSWORD: pass
+    ports:
+      - "3307:3307"
+    volumes:
+      - ./build/mysql/conf:/etc/mysql/conf.d 
+      - ./build/mysql/initdb:/docker-entrypoint-initdb.d
+    networks:
+      - backend
+
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:latest
+    container_name: opensearch-dashboards
+    environment:
+      OPENSEARCH_HOSTS: "https://opensearch:9200"
+    ports:
+      - 5601:5601
+    links:
+      - opensearch
+    networks:
+      - sandbox
+
+  opensearch:
+    build: build/opensearch
+    container_name: opensearch
+    environment:
+      - cluster.name=docker-cluster
+      - node.name=os-node
+      - cluster.initial_master_nodes=os-node
+      - bootstrap.memory_lock=true
+      - http.host=0.0.0.0
+      - transport.host=127.0.0.1
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - volume-opensearch:/usr/share/opensearch/data
+    ports:
+      - 9200:9200
+    networks:
+      - sandbox
+      - backend
+
+networks:
+  frontend:
+  backend:
+  sandbox:
+volumes:
+  node-modules:
+  volume-opensearch:
