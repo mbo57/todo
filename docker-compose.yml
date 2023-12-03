@@ -2,7 +2,9 @@ version: '3.3'
 
 services:
   frontend:
-    build: build/nodejs
+    build: 
+      context: .
+      dockerfile: ./build/nodejs/Dockerfile
     container_name: frontend
     depends_on:
       - backend
@@ -21,29 +23,35 @@ services:
     # tty: true
     depends_on:
       - db
-    build: build/go
+    build:
+      context: .
+      dockerfile: ./build/go/Dockerfile
     ports:
       - "8000:8000"
     volumes:
       - ./backend:/app
+      - ./.env:/app/.env
     networks:
       - frontend
       - backend
 
   db:
     image: mysql:5.7
-    build: build/mysql
+    build:
+      context: .
+      dockerfile: ./build/mysql/Dockerfile
     restart: always
     container_name: mysql
     environment:
-      MYSQL_ROOT_PASSWORD: pass
-      MYSQL_DATABASE: sample
-      MYSQL_PASSWORD: pass
+      MYSQL_ROOT_PASSWORD: ${DB_PASS}
+      MYSQL_DATABASE: ${DB_DB}
+      MYSQL_PASSWORD: $DB_PASS
     ports:
-      - "3307:3307"
+      - 13306:3306
     volumes:
       - ./build/mysql/conf:/etc/mysql/conf.d 
       - ./build/mysql/initdb:/docker-entrypoint-initdb.d
+      - mysql-volume:/var/lib/mysql
     networks:
       - backend
 
@@ -60,7 +68,9 @@ services:
       - sandbox
 
   opensearch:
-    build: build/opensearch
+    build:
+      context: .
+      dockerfile: ./build/opensearch/Dockerfile
     container_name: opensearch
     environment:
       - cluster.name=docker-cluster
@@ -89,3 +99,4 @@ networks:
 volumes:
   node-modules:
   volume-opensearch:
+  mysql-volume:
