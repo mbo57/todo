@@ -5,6 +5,7 @@ import (
 	"app/internal/usecase"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/labstack/echo"
 )
@@ -50,6 +51,9 @@ func (th *todoHandlerImpl) CreateTodo(c echo.Context) error {
 	if err := c.Bind(&todo); err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
+	now := time.Now()
+	todo.Created = domain.SetTime(now)
+	todo.Updated = domain.SetTime(now)
 	if err := th.tu.CreateTodo(todo); err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -65,6 +69,13 @@ func (th *todoHandlerImpl) UpdateTodo(c echo.Context) error {
 	if err := c.Bind(&todo); err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
+	beforeTodo, err := th.tu.GetTodoById(todoId)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	now := time.Now()
+	todo.Created = beforeTodo.Created
+	todo.Updated = domain.SetTime(now)
 	todo.Id = todoId
 	if err := th.tu.UpdateTodo(todoId, todo); err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())

@@ -23,10 +23,14 @@ type MyTime struct {
 	time.Time
 }
 
+func SetTime(tt time.Time) *MyTime {
+	return &MyTime{tt}
+}
+
 func (t *MyTime) UnmarshalJSON(buf []byte) error {
 	s := bytes.Trim(buf, `"`)
-	tt, err := time.Parse(time.DateTime, string(s))
-	*t = MyTime(MyTime{tt})
+	tt, err := time.ParseInLocation(time.DateTime, string(s), time.Local)
+	*t = MyTime{tt}
 	return err
 }
 

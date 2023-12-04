@@ -18,13 +18,13 @@ func NewDB() *gorm.DB {
 		log.Fatalln(err)
 	}
 
-	writer := fmt.Sprintf("%s:%s@%s/%s?charset=utf8&parseTime=true",
+	writer := fmt.Sprintf("%s:%s@%s/%s?charset=utf8&parseTime=true&loc=Asia%%2FTokyo",
 		os.Getenv("DB_USER"),
 		os.Getenv("DB_PASS"),
 		os.Getenv("WRITER_DB_HOST"),
 		os.Getenv("DB_DB"),
 	)
-	reader := fmt.Sprintf("%s:%s@%s/%s?charset=utf8&parseTime=true",
+	reader := fmt.Sprintf("%s:%s@%s/%s?charset=utf8&parseTime=true&loc=Asia%%2FTokyo",
 		os.Getenv("DB_USER"),
 		os.Getenv("DB_PASS"),
 		os.Getenv("READER_DB_HOST"),
