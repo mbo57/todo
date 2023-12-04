@@ -7,7 +7,7 @@ import (
 )
 
 type Todo struct {
-	Id          string  `gorm:"column:id;primaryKey;autoincrement"`
+	Id          int     `gorm:"column:id;primaryKey;autoincrement"`
 	Title       string  `gorm:"column:title;not null" json:"title"`
 	Description string  `gorm:"column:description" json:"description"`
 	Deadline    *MyTime `gorm:"column:deadline;type:datatime" json:"deadline"`
