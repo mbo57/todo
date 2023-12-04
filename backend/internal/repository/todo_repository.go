@@ -9,7 +9,7 @@ import (
 type TodoRepositry interface {
 	GetAllTodos(todos *domain.Todos) error
 	GetTodoById(todoId int, todo *domain.Todo) error
-	// CreateTodo(todo *domain.Todo) error
+	CreateTodo(todo *domain.Todo) error
 	// UpdateTodo(todo *domain.Todo) error
 	// DeleteTodo(todoId int) error
 }
@@ -31,6 +31,13 @@ func (tr *todoRepositryImpl) GetAllTodos(todos *domain.Todos) error {
 
 func (tr *todoRepositryImpl) GetTodoById(todoId int, todo *domain.Todo) error {
 	if err := tr.db.Where("id = ?", todoId).First(&todo).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (tr *todoRepositryImpl) CreateTodo(todo *domain.Todo) error {
+	if err := tr.db.Create(&todo).Error; err != nil {
 		return err
 	}
 	return nil

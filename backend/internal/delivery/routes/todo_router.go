@@ -11,6 +11,7 @@ func NewTodoRouter(th handlers.TodoHandler) *echo.Echo {
 	t := e.Group("todos")
 	t.GET("", th.GetAllTodos)
 	t.GET("/:todoId", th.GetTodoById)
+	t.POST("", th.CreateTodo)
 
 	return e
 }

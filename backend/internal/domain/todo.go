@@ -1,20 +1,47 @@
 package domain
 
 import (
+	"bytes"
+	"database/sql/driver"
 	"time"
 )
 
 type Todo struct {
-	Id          string    `gorm:"column:id;primaryKey;autoincrement"`
-	Title       string    `gorm:"column:title;not null"`
-	Description string    `gorm:"column:description"`
-	Deadline    time.Time `gorm:"column:deadline"`
-	Priority    string    `gorm:"column:priority"`
-	Category    string    `gorm:"column:category"`
-	Created     time.Time `gorm:"column:created"`
-	Updated     time.Time `gorm:"column:updated"`
-	Status      string    `gorm:"column:status"`
-	Assignee    string    `gorm:"column:assignee"`
+	Id          string  `gorm:"column:id;primaryKey;autoincrement"`
+	Title       string  `gorm:"column:title;not null" json:"title"`
+	Description string  `gorm:"column:description" json:"description"`
+	Deadline    *MyTime `gorm:"column:deadline;type:datatime" json:"deadline"`
+	Priority    string  `gorm:"column:priority" json:"priority"`
+	Category    string  `gorm:"column:category" json:"category"`
+	Created     *MyTime `gorm:"column:created;type:datatime" json:"created"`
+	Updated     *MyTime `gorm:"column:updated;type:datatime" json:"updated"`
+	Status      string  `gorm:"column:status" json:"status"`
+	Assignee    string  `gorm:"column:assignee" json:"assignee"`
+}
+
+type MyTime struct {
+	time.Time
+}
+
+func (t *MyTime) UnmarshalJSON(buf []byte) error {
+	s := bytes.Trim(buf, `"`)
+	tt, err := time.Parse(time.DateTime, string(s))
+	*t = MyTime(MyTime{tt})
+	return err
+}
+
+func (t MyTime) MarshalJSON() ([]byte, error) {
+	str := t.Format(time.DateTime)
+	return []byte(`"` + str + `"`), nil
+}
+
+func (t *MyTime) Scan(value interface{}) error {
+	t.Time = value.(time.Time)
+	return nil
+}
+
+func (t MyTime) Value() (driver.Value, error) {
+	return t.Time, nil
 }
 
 type Todos []Todo
