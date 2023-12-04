@@ -14,7 +14,7 @@ type TodoHandler interface {
 	GetTodoById(c echo.Context) error
 	CreateTodo(c echo.Context) error
 	UpdateTodo(c echo.Context) error
-	// DeleteTodo(c echo.Context) error
+	DeleteTodo(c echo.Context) error
 }
 
 type todoHandlerImpl struct {
@@ -70,4 +70,15 @@ func (th *todoHandlerImpl) UpdateTodo(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 	return c.JSON(http.StatusOK, todo)
+}
+
+func (th *todoHandlerImpl) DeleteTodo(c echo.Context) error {
+	todoId, err := strconv.Atoi(c.Param("todoId"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+	if err := th.tu.DeleteTodo(todoId); err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.NoContent(http.StatusNoContent)
 }

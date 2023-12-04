@@ -10,7 +10,7 @@ type TodoUsecase interface {
 	GetTodoById(todoId int) (domain.Todo, error)
 	CreateTodo(todo domain.Todo) error
 	UpdateTodo(todoId int, todo domain.Todo) error
-	// DeleteTodo(todoId int) error
+	DeleteTodo(todoId int) error
 }
 
 type todoUsecaseImpl struct {
@@ -46,6 +46,13 @@ func (tu *todoUsecaseImpl) CreateTodo(todo domain.Todo) error {
 
 func (tu *todoUsecaseImpl) UpdateTodo(todoId int, todo domain.Todo) error {
 	if err := tu.tr.UpdateTodo(todoId, &todo); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (tu *todoUsecaseImpl) DeleteTodo(todoId int) error {
+	if err := tu.tr.DeleteTodo(todoId); err != nil {
 		return err
 	}
 	return nil
