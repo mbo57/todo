@@ -7,7 +7,7 @@ import (
 
 type TodoUsecase interface {
 	GetAllTodos() (domain.Todos, error)
-	// GetTodoById(todoId int) (domain.Todo, error)
+	GetTodoById(todoId int) (domain.Todo, error)
 	// CreateTodo(todo domain.Todo) error
 	// UpdateTodo(todo domain.Todo) error
 	// DeleteTodo(todoId int) error
@@ -28,4 +28,13 @@ func (tu *todoUsecaseImpl) GetAllTodos() (domain.Todos, error) {
 	}
 
 	return todos, nil
+}
+
+func (tu *todoUsecaseImpl) GetTodoById(todoId int) (domain.Todo, error) {
+	todo := domain.Todo{}
+	if err := tu.tr.GetTodoById(todoId, &todo); err != nil {
+		return domain.Todo{}, err
+	}
+
+	return todo, nil
 }
